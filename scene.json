@@ -68,10 +68,7 @@
     "portableExperiences": "enabled"
   },
   "worldConfiguration": {
-    "name": "kuruk.dcl.eth",
-    "placesConfig": {
-      "optOut": true
-    }
+    "name": "kuruk.dcl.eth"
   },
   "skyboxConfig": {},
   "source": {

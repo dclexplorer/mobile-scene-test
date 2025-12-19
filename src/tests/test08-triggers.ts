@@ -14,7 +14,8 @@ import {
   Tween,
   EasingFunction,
   TweenSequence,
-  TweenLoop
+  TweenLoop,
+  AvatarShape
 } from '@dcl/sdk/ecs'
 import { Vector3, Color4, Quaternion, Color3 } from '@dcl/sdk/math'
 import { createPlatform, createLabel, TriggerVisual, TRIGGER_COLOR_OUTSIDE, TRIGGER_COLOR_INSIDE } from '../utils/helpers'
@@ -31,8 +32,8 @@ export function setupTriggersTest() {
 
   // Platform floor for trigger area test
   createPlatform(
-    Vector3.create(-40, 0.05, 33),
-    Vector3.create(64, 0.1, 90),
+    Vector3.create(-40, 0.05, 41),
+    Vector3.create(64, 0.1, 110),
     Color4.create(0.2, 0.2, 0.2, 1)
   )
 
@@ -934,6 +935,120 @@ export function setupTriggersTest() {
     0.8
   )
 
+  // =========================================================================
+  // ROW 8: AvatarShape NPC Walking Through Trigger
+  // Testing if CL_PLAYER trigger detects AvatarShape entities
+  // =========================================================================
+  const row8Z = triggerBaseZ + 74
+
+  createLabel('AVATARSHAPE NPC TEST\nDoes CL_PLAYER detect NPCs?', Vector3.create(triggerBaseX + 15, 8, row8Z - 5), 1.2)
+
+  // Trigger area for NPC to walk through
+  const npcTrigger = engine.addEntity()
+  Transform.create(npcTrigger, {
+    position: Vector3.create(triggerBaseX + 15, 2, row8Z),
+    scale: Vector3.create(6, 4, 6)
+  })
+  MeshRenderer.setBox(npcTrigger)
+  Material.setPbrMaterial(npcTrigger, {
+    albedoColor: TRIGGER_COLOR_OUTSIDE,
+    transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
+  })
+  TriggerArea.setBox(npcTrigger, ColliderLayer.CL_PLAYER)
+
+  // Status label for NPC trigger
+  const npcTriggerStatus = engine.addEntity()
+  Transform.create(npcTriggerStatus, {
+    position: Vector3.create(triggerBaseX + 15, 6, row8Z)
+  })
+  TextShape.create(npcTriggerStatus, {
+    text: 'NPC TRIGGER: Waiting...',
+    fontSize: 2,
+    textColor: Color4.White(),
+    outlineWidth: 0.2,
+    outlineColor: Color3.Black()
+  })
+  Billboard.create(npcTriggerStatus)
+
+  let npcEnterCount = 0
+  let npcExitCount = 0
+
+  triggerAreaEventsSystem.onTriggerEnter(npcTrigger, (result) => {
+    npcEnterCount++
+    const entityId = result.trigger?.entity ?? 'unknown'
+    TextShape.getMutable(npcTriggerStatus).text = `NPC TRIGGER: ENTER #${npcEnterCount}\nEntity: ${entityId}`
+    TextShape.getMutable(npcTriggerStatus).textColor = Color4.Green()
+    Material.setPbrMaterial(npcTrigger, {
+      albedoColor: TRIGGER_COLOR_INSIDE,
+      transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
+    })
+    console.log(`NPC TRIGGER: ENTER - entity ${entityId}`)
+  })
+
+  triggerAreaEventsSystem.onTriggerExit(npcTrigger, (result) => {
+    npcExitCount++
+    const entityId = result.trigger?.entity ?? 'unknown'
+    TextShape.getMutable(npcTriggerStatus).text = `NPC TRIGGER: EXIT #${npcExitCount}\nEntity: ${entityId}`
+    TextShape.getMutable(npcTriggerStatus).textColor = Color4.Red()
+    Material.setPbrMaterial(npcTrigger, {
+      albedoColor: TRIGGER_COLOR_OUTSIDE,
+      transparencyMode: MaterialTransparencyMode.MTM_ALPHA_BLEND
+    })
+    console.log(`NPC TRIGGER: EXIT - entity ${entityId}`)
+  })
+
+  // Create NPC with AvatarShape that walks through the trigger
+  const npcAvatar = engine.addEntity()
+  const npcStartPos = Vector3.create(triggerBaseX, 0, row8Z)
+  const npcEndPos = Vector3.create(triggerBaseX + 30, 0, row8Z)
+
+  Transform.create(npcAvatar, {
+    position: npcStartPos
+  })
+
+  // Add AvatarShape to make it look like a player
+  AvatarShape.create(npcAvatar, {
+    id: 'npc-test-avatar',
+    name: 'Test NPC',
+    bodyShape: 'urn:decentraland:off-chain:base-avatars:BaseFemale',
+    wearables: [
+      'urn:decentraland:off-chain:base-avatars:f_eyes_00',
+      'urn:decentraland:off-chain:base-avatars:f_eyebrows_00',
+      'urn:decentraland:off-chain:base-avatars:f_mouth_00',
+      'urn:decentraland:off-chain:base-avatars:standard_hair',
+      'urn:decentraland:off-chain:base-avatars:f_simple_yellow_tshirt',
+      'urn:decentraland:off-chain:base-avatars:f_brown_trousers',
+      'urn:decentraland:off-chain:base-avatars:bun_shoes'
+    ],
+    emotes: []
+  })
+
+  // NO extra collider - testing if AvatarShape alone triggers CL_PLAYER
+
+  // Move NPC back and forth through the trigger
+  Tween.create(npcAvatar, {
+    mode: Tween.Mode.Move({
+      start: npcStartPos,
+      end: npcEndPos
+    }),
+    duration: 6000,
+    easingFunction: EasingFunction.EF_LINEAR
+  })
+  TweenSequence.create(npcAvatar, {
+    loop: TweenLoop.TL_YOYO,
+    sequence: []
+  })
+
+  // Label for NPC start position
+  createLabel('NPC Start\n(AvatarShape)', Vector3.create(triggerBaseX, 3, row8Z), 0.8)
+  createLabel('NPC End', Vector3.create(triggerBaseX + 30, 3, row8Z), 0.8)
+
+  createLabel(
+    'TEST: AvatarShape NPC walks through\nCL_PLAYER trigger. Does it detect?',
+    Vector3.create(triggerBaseX + 15, 1, row8Z + 6),
+    0.7
+  )
+
   // Row labels
   createLabel('ROW 1: Basic Shapes', Vector3.create(triggerBaseX - 15, 3, row1Z), 1)
   createLabel('ROW 2: Collision Layers', Vector3.create(triggerBaseX - 15, 3, row2Z), 1)
@@ -942,4 +1057,5 @@ export function setupTriggersTest() {
   createLabel('ROW 5: Moving Triggers', Vector3.create(triggerBaseX - 15, 3, row5Z), 1)
   createLabel('ROW 6: Physics Ball Track', Vector3.create(triggerBaseX - 15, 3, row6Z), 1)
   createLabel('ROW 7: Layer Change', Vector3.create(triggerBaseX - 15, 3, row7Z), 1)
+  createLabel('ROW 8: AvatarShape NPC', Vector3.create(triggerBaseX - 15, 3, row8Z), 1)
 }
