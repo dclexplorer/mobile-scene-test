@@ -16,6 +16,12 @@ import { setupContinuousTweensTest } from './tests/test10-continuous-tweens'
 import { setupTextureTweensTest } from './tests/test11-texture-tweens'
 import { setupBoundaryTriggerTest } from './tests/test13-boundary-trigger'
 import { setupVideoStreamingTest } from './tests/test14-video-streaming'
+import { setupMiscTest } from './tests/test15-misc'
+import { setupMeshesTest } from './tests/test16-meshes'
+import { setupMaterialsTest } from './tests/test17-materials'
+import { setupGltfModelsTest } from './tests/test18-gltf-models'
+import { setupAnimationsTest } from './tests/test19-animations'
+import { setupMorphTargetsTest } from './tests/test20-morph-targets'
 
 // ============================================================================
 // MAIN SCENE
@@ -79,6 +85,28 @@ export function main() {
   // TEST 14: Video Streaming Test
   setupVideoStreamingTest()
 
+  // TEST 15: MISC - VirtualCamera and InputModifier
+  setupMiscTest()
+
+  // -------------------------------------------------------------------------
+  // VISUAL TEST PLATFORM
+  // -------------------------------------------------------------------------
+
+  // TEST 16: Primitive Meshes
+  setupMeshesTest()
+
+  // TEST 17: PBR Materials
+  setupMaterialsTest()
+
+  // TEST 18: GLTF/GLB Models (Static)
+  setupGltfModelsTest()
+
+  // TEST 19: GLTF Animations
+  setupAnimationsTest()
+
+  // TEST 20: Morph Targets
+  setupMorphTargetsTest()
+
   console.log('All test platforms created')
-  console.log('Tests: Staircase, Gap Jumps, Descend, Step Heights, Ramps, Corridor Width, Control Mapping, Trigger Areas, Wall Teleport, Continuous Tweens, Texture Tweens, Boundary Trigger, Video Streaming')
+  console.log('Tests: Staircase, Gap Jumps, Descend, Step Heights, Ramps, Corridor Width, Control Mapping, Trigger Areas, Wall Teleport, Continuous Tweens, Texture Tweens, Boundary Trigger, Video Streaming, MISC, Meshes, Materials, GLTF Models, Animations, Morph Targets')
 }
