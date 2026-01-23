@@ -5,20 +5,18 @@ import {
   Material,
   Tween,
   TextureWrapMode,
-  tweenSystem,
   Entity,
-  Schemas
+  Schemas,
+  TweenSequence,
+  TweenLoop,
+  TextureMovementType
 } from '@dcl/sdk/ecs'
 import { Vector3, Color4, Vector2 } from '@dcl/sdk/math'
 import { createPlatform, createLabel } from '../utils/helpers'
 
 // Custom component to track texture move tween data
-const TextureMoveLoop = engine.defineComponent('TextureMoveLoop', {
-  startX: Schemas.Float,
-  startY: Schemas.Float,
-  endX: Schemas.Float,
-  endY: Schemas.Float,
-  duration: Schemas.Float
+const TextureMoveReadback = engine.defineComponent('TextureMoveReadback', {
+  entity: Schemas.Entity
 })
 
 /**
@@ -144,7 +142,8 @@ export function setupTextureTweensTest() {
     startUV: Vector2,
     endUV: Vector2,
     duration: number,
-    labelText: string
+    labelText: string,
+    textureMovementType: TextureMovementType
   ): Entity {
     const entity = engine.addEntity()
     Transform.create(entity, {
@@ -160,17 +159,22 @@ export function setupTextureTweensTest() {
       })
     })
 
-    // Add custom component to track loop data
-    TextureMoveLoop.create(entity, {
-      startX: startUV.x,
-      startY: startUV.y,
-      endX: endUV.x,
-      endY: endUV.y,
-      duration: duration
+    // Start the initial tween
+    Tween.setTextureMove(entity, startUV, endUV, duration, textureMovementType)
+    TweenSequence.create(entity, {
+      loop: TweenLoop.TL_RESTART,
+      sequence: [],
     })
 
-    // Start the initial tween
-    Tween.setTextureMove(entity, startUV, endUV, duration)
+    const entity2 = engine.addEntity()
+    Transform.create(entity2, {
+      position: Vector3.create(position.x, 10, position.z),
+      scale: Vector3.create(4, 4, 0.2)
+    })
+    MeshRenderer.setPlane(entity2)
+    TextureMoveReadback.create(entity, {
+      entity: entity2
+    })
 
     // Create label
     createLabel(labelText, Vector3.create(position.x, 6, position.z), 0.9)
@@ -185,7 +189,8 @@ export function setupTextureTweensTest() {
     Vector2.create(0, 0),
     Vector2.create(1, 0),
     4000,
-    'X: 0→1'
+    'X: 0→1',
+    TextureMovementType.TMT_OFFSET
   )
 
   // T2.2 TextureMove Y
@@ -195,7 +200,8 @@ export function setupTextureTweensTest() {
     Vector2.create(0, 0),
     Vector2.create(0, 1),
     4000,
-    'Y: 0→1'
+    'Y: 0→1',
+    TextureMovementType.TMT_OFFSET
   )
 
   // T2.3 TextureMove diagonal
@@ -205,7 +211,8 @@ export function setupTextureTweensTest() {
     Vector2.create(0, 0),
     Vector2.create(1, 1),
     4000,
-    'Diagonal'
+    'Diagonal',
+    TextureMovementType.TMT_OFFSET
   )
 
   // T2.4 TextureMove X reverse
@@ -215,7 +222,8 @@ export function setupTextureTweensTest() {
     Vector2.create(1, 0),
     Vector2.create(0, 0),
     4000,
-    'X: 1→0'
+    'X: 1→0',
+    TextureMovementType.TMT_OFFSET
   )
 
   // T2.5 TextureMove Y reverse
@@ -225,21 +233,79 @@ export function setupTextureTweensTest() {
     Vector2.create(0, 1),
     Vector2.create(0, 0),
     4000,
-    'Y: 1→0'
+    'Y: 1→0',
+    TextureMovementType.TMT_OFFSET
+  )
+
+  // =========================================================================
+  // ROW 2: TextureMove with looping via component tracking
+  // =========================================================================
+  const ttRow3Z = textureTweenBaseZ + 12
+
+  createLabel('ROW 3: Tiling TextureMove (looping)', Vector3.create(textureTweenBaseX - 25, 3, ttRow3Z), 1)
+
+  // T3.1 Tiling TextureMove X
+  createLoopingTextureMove(
+    Vector3.create(textureTweenBaseX - 15, 2.5, ttRow3Z),
+    Color4.create(0.7, 0.4, 0.9, 1),
+    Vector2.create(1, 1),
+    Vector2.create(2, 1),
+    4000,
+    'X: 1→2',
+    TextureMovementType.TMT_TILING
+  )
+
+  // T3.2 Tiling TextureMove Y
+  createLoopingTextureMove(
+    Vector3.create(textureTweenBaseX - 5, 2.5, ttRow3Z),
+    Color4.create(0.4, 0.7, 0.9, 1),
+    Vector2.create(1, 1),
+    Vector2.create(1, 2),
+    4000,
+    'Y: 1→2',
+    TextureMovementType.TMT_TILING
+  )
+
+  // T3.3 Tiling TextureMove diagonal
+  createLoopingTextureMove(
+    Vector3.create(textureTweenBaseX + 5, 2.5, ttRow3Z),
+    Color4.create(0.9, 0.9, 0.4, 1),
+    Vector2.create(1, 1),
+    Vector2.create(2, 2),
+    4000,
+    'Diagonal',
+    TextureMovementType.TMT_TILING
+  )
+
+  // T3.4 Tiling TextureMove X reverse
+  createLoopingTextureMove(
+    Vector3.create(textureTweenBaseX + 15, 2.5, ttRow3Z),
+    Color4.create(0.4, 0.9, 0.4, 1),
+    Vector2.create(2, 1),
+    Vector2.create(1, 1),
+    4000,
+    'X: 2→1',
+    TextureMovementType.TMT_TILING
+  )
+
+  // T3.5 Tiling TextureMove Y reverse
+  createLoopingTextureMove(
+    Vector3.create(textureTweenBaseX + 25, 2.5, ttRow3Z),
+    Color4.create(0.9, 0.5, 0.2, 1),
+    Vector2.create(1, 2),
+    Vector2.create(1, 1),
+    4000,
+    'Y: 2→1',
+    TextureMovementType.TMT_TILING
   )
 
   // System to restart TextureMove tweens when they complete
   engine.addSystem(() => {
-    for (const [entity] of engine.getEntitiesWith(TextureMoveLoop, Tween)) {
-      if (tweenSystem.tweenCompleted(entity)) {
-        const loopData = TextureMoveLoop.get(entity)
-        const start = Vector2.create(loopData.startX, loopData.startY)
-        const end = Vector2.create(loopData.endX, loopData.endY)
-
-        // Delete old tween and create new one
-        Tween.deleteFrom(entity)
-        Tween.setTextureMove(entity, start, end, loopData.duration)
-      }
+    for (const [entity] of engine.getEntitiesWith(TextureMoveReadback, Material)) {
+      const texture_move_readback = TextureMoveReadback.get(entity)
+      const material = Material.get(entity)
+      Material.deleteFrom(texture_move_readback.entity)
+      Material.create(texture_move_readback.entity, material)
     }
   })
 }
