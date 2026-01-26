@@ -1,6 +1,8 @@
-import { Vector3, Color4 } from '@dcl/sdk/math'
+import { engine, Transform, TextShape } from '@dcl/sdk/ecs'
+import { Vector3, Color4, Color3 } from '@dcl/sdk/math'
 import { setupUI } from './ui'
 import { createPlatform, createLabel } from './utils/helpers'
+import { SCENE_VERSION } from './version'
 
 // Import all test setup functions
 import { setupStaircaseTest } from './tests/test01-staircase'
@@ -29,6 +31,19 @@ import { setupMorphTargetsTest } from './tests/test20-morph-targets'
 
 export function main() {
   setupUI()
+
+  // Version label at origin
+  const versionLabel = engine.addEntity()
+  Transform.create(versionLabel, {
+    position: Vector3.create(0, 0, 0)
+  })
+  TextShape.create(versionLabel, {
+    text: `v${SCENE_VERSION}`,
+    fontSize: 1,
+    textColor: Color4.White(),
+    outlineWidth: 0.2,
+    outlineColor: Color3.Black()
+  })
 
   console.log('Mobile Test Scene Initialized')
 
