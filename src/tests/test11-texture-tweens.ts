@@ -247,7 +247,7 @@ export function setupTextureTweensTest() {
   // T3.1 Tiling TextureMove X
   createLoopingTextureMove(
     Vector3.create(textureTweenBaseX - 15, 2.5, ttRow3Z),
-    Color4.create(0.7, 0.4, 0.9, 1),
+    Color4.create(0.7, 0.4, 0.95, 1),
     Vector2.create(1, 1),
     Vector2.create(2, 1),
     4000,
@@ -258,7 +258,7 @@ export function setupTextureTweensTest() {
   // T3.2 Tiling TextureMove Y
   createLoopingTextureMove(
     Vector3.create(textureTweenBaseX - 5, 2.5, ttRow3Z),
-    Color4.create(0.4, 0.7, 0.9, 1),
+    Color4.create(0.4, 0.7, 0.95, 1),
     Vector2.create(1, 1),
     Vector2.create(1, 2),
     4000,
@@ -269,7 +269,7 @@ export function setupTextureTweensTest() {
   // T3.3 Tiling TextureMove diagonal
   createLoopingTextureMove(
     Vector3.create(textureTweenBaseX + 5, 2.5, ttRow3Z),
-    Color4.create(0.9, 0.9, 0.4, 1),
+    Color4.create(0.9, 0.9, 0.45, 1),
     Vector2.create(1, 1),
     Vector2.create(2, 2),
     4000,
@@ -280,7 +280,7 @@ export function setupTextureTweensTest() {
   // T3.4 Tiling TextureMove X reverse
   createLoopingTextureMove(
     Vector3.create(textureTweenBaseX + 15, 2.5, ttRow3Z),
-    Color4.create(0.4, 0.9, 0.4, 1),
+    Color4.create(0.4, 0.9, 0.45, 1),
     Vector2.create(2, 1),
     Vector2.create(1, 1),
     4000,
@@ -291,7 +291,7 @@ export function setupTextureTweensTest() {
   // T3.5 Tiling TextureMove Y reverse
   createLoopingTextureMove(
     Vector3.create(textureTweenBaseX + 25, 2.5, ttRow3Z),
-    Color4.create(0.9, 0.5, 0.2, 1),
+    Color4.create(0.9, 0.5, 0.25, 1),
     Vector2.create(1, 2),
     Vector2.create(1, 1),
     4000,
