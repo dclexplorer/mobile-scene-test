@@ -250,7 +250,7 @@ export function setupContinuousTweensTest() {
     "XY",
     continuousTweenBaseX - 16,
     ctRow2Z,
-    Vector3.create(1, 1, 0),
+    Vector3.normalize(Vector3.create(1, 1, 0)),
     Color4.create(0.8, 0.8, 0.3, 1)
   )
 
@@ -259,7 +259,7 @@ export function setupContinuousTweensTest() {
     "XZ",
     continuousTweenBaseX - 8,
     ctRow2Z,
-    Vector3.create(1, 0, 1),
+    Vector3.normalize(Vector3.create(1, 0, 1)),
     Color4.create(0.3, 0.8, 0.8, 1)
   )
 
@@ -268,7 +268,7 @@ export function setupContinuousTweensTest() {
     "YZ",
     continuousTweenBaseX,
     ctRow2Z,
-    Vector3.create(0, 1, 1),
+    Vector3.normalize(Vector3.create(0, 1, 1)),
     Color4.create(0.8, 0.3, 0.8, 1)
   )
 
@@ -284,7 +284,7 @@ export function setupContinuousTweensTest() {
     "XYZ",
     continuousTweenBaseX - 12,
     ctRow3Z,
-    Vector3.create(1, 1, 1),
+    Vector3.normalize(Vector3.create(1, 1, 1)),
     Color4.create(1, 1, 1, 1)
   )
 
