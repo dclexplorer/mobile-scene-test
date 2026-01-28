@@ -157,6 +157,13 @@ export function setupTextureTweensTest() {
       scale: Vector3.create(4, 4, 0.2)
     })
     MeshRenderer.setPlane(entity2)
+    Material.setPbrMaterial(entity2, {
+      albedoColor: Color4.create(color.r + 0.05, color.g, color.b, color.a),
+      texture: Material.Texture.Common({
+        src: 'images/scene-thumbnail.png',
+        wrapMode: TextureWrapMode.TWM_REPEAT
+      })
+    })
     TextureMoveReadback.create(entity, {
       entity: entity2
     })
@@ -286,11 +293,33 @@ export function setupTextureTweensTest() {
 
   // System to restart TextureMove tweens when they complete
   engine.addSystem(() => {
-    for (const [entity] of engine.getEntitiesWith(TextureMoveReadback, Material)) {
-      const texture_move_readback = TextureMoveReadback.get(entity)
-      const material = Material.get(entity)
-      Material.deleteFrom(texture_move_readback.entity)
-      Material.create(texture_move_readback.entity, material)
+    for (const [entity, texture_move_readback, readback_material] of engine.getEntitiesWith(TextureMoveReadback, Material)) {
+      const material = Material.getMutableOrNull(texture_move_readback.entity)
+      if (material) {
+        if (readback_material.material && material.material) {
+          const readback_material_material = readback_material.material;
+          const material_material = material.material;
+          if (readback_material_material.$case == "pbr" && material_material.$case == "pbr") {
+            const pbr_readback_material = readback_material_material.pbr;
+            const pbr_material = material_material.pbr;
+            if (pbr_readback_material.texture && pbr_material.texture) {
+              const readback_texture = pbr_readback_material.texture;
+              const texture = pbr_material.texture;
+              if (readback_texture.tex && texture.tex) {
+                const readback_tex = readback_texture.tex;
+                const tex = texture.tex;
+                if (readback_tex.$case == "texture" && tex.$case == "texture") {
+                  const readback_texture = readback_tex.texture;
+                  const texture = tex.texture;
+
+                  texture.offset = readback_texture.offset;
+                  texture.tiling = readback_texture.tiling;
+                }
+              }
+            }
+          }
+        }
+      }
     }
   })
 }
